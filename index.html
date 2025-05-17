@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quote Filter</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    #filter { width: 100%; padding: 10px; margin-bottom: 20px; }
+    ul { list-style-type: none; padding: 0; }
+    li { padding: 10px 0; border-bottom: 1px solid #ddd; }
+    .error { color: red; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Quotes</h1>
+  <input type="text" id="filter" placeholder="Filter quotes...">
+  <p class="error" id="error-message" style="display:none;"></p>
+  <ul id="quote-list"></ul>
+
+  <script>
+    const quoteList = document.getElementById('quote-list');
+    const filterInput = document.getElementById('filter');
+    const errorMessage = document.getElementById('error-message');
+    let quotes = [];
+
+    fetch('https://dummyjson.com/quotes')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        quotes = data.quotes;
+        displayQuotes(quotes);
+      })
+      .catch(error => {
+        errorMessage.textContent = 'Failed to load quotes. Please try again later.';
+        errorMessage.style.display = 'block';
+      });
+
+    function displayQuotes(filteredQuotes) {
+      quoteList.innerHTML = '';
+      filteredQuotes.forEach(quote => {
+        const li = document.createElement('li');
+        li.textContent = quote.quote;
+        quoteList.appendChild(li);
+      });
+    }
+
+    filterInput.addEventListener('input', () => {
+      const filterText = filterInput.value.toLowerCase();
+      const filtered = quotes.filter(q => q.quote.toLowerCase().includes(filterText));
+      displayQuotes(filtered);
+    });
+  </script>
+</body>
+</html>
